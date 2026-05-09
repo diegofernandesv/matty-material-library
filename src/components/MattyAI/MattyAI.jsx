@@ -17,12 +17,91 @@ function IconUpload() {
 function IconSend() {
   return <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M13.5 2.5L7 9M13.5 2.5L9 14L7 9M13.5 2.5L2 6.5L7 9" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>;
 }
+function IconExpand() {
+  return <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M8 3H5a2 2 0 00-2 2v3M21 8V5a2 2 0 00-2-2h-3M16 21h3a2 2 0 002-2v-3M3 16v3a2 2 0 002 2h3" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>;
+}
+function IconCollapse() {
+  return <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M4 14h6m0 0v6m0-6L3 21M20 10h-6m0 0V4m0 6l7-7" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>;
+}
+function IconMattyBrand() {
+  return <svg width="16" height="16" viewBox="0 0 20 20" fill="none"><path d="M10 2C6.686 2 4 4.686 4 8C4 10.21 5.164 12.148 6.916 13.254L6 18L10.5 15.9C10.666 15.966 10.832 16 11 16C14.314 16 17 13.314 17 10C17 6.686 13.866 2 10 2Z" stroke="currentColor" strokeWidth="1.5" strokeLinejoin="round"/><circle cx="7.5" cy="9" r="0.9" fill="currentColor"/><circle cx="10" cy="9" r="0.9" fill="currentColor"/><circle cx="12.5" cy="9" r="0.9" fill="currentColor"/></svg>;
+}
+function IconNewChat() {
+  return <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 3H13a1 1 0 011 1v8a1 1 0 01-1 1H3a1 1 0 01-1-1V8M5 1L1 5m0 0l4 4M1 5h8" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round"/></svg>;
+}
+function IconSearchChat() {
+  return <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="7" cy="7" r="4.5" stroke="currentColor" strokeWidth="1.2"/><path d="M10.5 10.5L14 14" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round"/></svg>;
+}
 
 const QUICK_ACTIONS = [
-  { id: 'create', Icon: IconCreate, label: 'Create a material' },
-  { id: 'find',   Icon: IconFind,   label: 'Find materials' },
-  { id: 'compare',Icon: IconCompare,label: 'Compare materials' },
+  { id: 'create',  Icon: IconCreate,  label: 'Create a material' },
+  { id: 'find',    Icon: IconFind,    label: 'Find materials' },
+  { id: 'compare', Icon: IconCompare, label: 'Compare materials' },
 ];
+
+const FIND_FILTERS = {
+  brand: [
+    'Vero Moda', 'Jack & Jones', 'Vila', 'Only', 'Selected Homme',
+    'Junarose', 'Pieces', 'Mamalicious', 'Noisy May', 'Object', 'Name It',
+  ],
+  category: ['Woven', 'Knit', 'Filling', 'Leather', 'Technical', 'Non-Woven'],
+  composition: ['Cotton', 'Polyester', 'Wool', 'Silk', 'Linen', 'Nylon', 'Viscose', 'Recycled'],
+};
+
+function FindFilterMessage({ onSearch }) {
+  const [sel, setSel] = useState({ brand: [], category: [], composition: [] });
+
+  const toggle = (group, value) => {
+    setSel(prev => {
+      const has = prev[group].includes(value);
+      return { ...prev, [group]: has ? prev[group].filter(v => v !== value) : [...prev[group], value] };
+    });
+  };
+
+  const totalSelected = sel.brand.length + sel.category.length + sel.composition.length;
+
+  const handleSearch = () => {
+    const parts = [];
+    if (sel.brand.length)       parts.push(`brand is ${sel.brand.join(' or ')}`);
+    if (sel.category.length)    parts.push(`category is ${sel.category.join(' or ')}`);
+    if (sel.composition.length) parts.push(`composition contains ${sel.composition.join(' or ')}`);
+    const query = parts.length
+      ? `Find materials where ${parts.join(', ')}`
+      : 'Show me all materials';
+    onSearch(query);
+  };
+
+  return (
+    <div className="matty-find">
+      <p className="matty-find__intro">Pick filters and I'll search for you:</p>
+
+      {Object.entries(FIND_FILTERS).map(([group, options]) => (
+        <div key={group} className="matty-find__group">
+          <span className="matty-find__group-label">{group.toUpperCase()}</span>
+          <div className="matty-find__chips">
+            {options.map(opt => (
+              <button
+                key={opt}
+                className={`matty-find__chip${sel[group].includes(opt) ? ' matty-find__chip--on' : ''}`}
+                onClick={() => toggle(group, opt)}
+              >
+                {opt}
+              </button>
+            ))}
+          </div>
+        </div>
+      ))}
+
+      <button
+        className="matty-find__search-btn"
+        onClick={handleSearch}
+      >
+        <IconFind />
+        {totalSelected > 0 ? `Search (${totalSelected} filter${totalSelected > 1 ? 's' : ''})` : 'Show all materials'}
+      </button>
+    </div>
+  );
+}
 
 const WELCOME_MESSAGE = {
   id: 'welcome',
@@ -125,11 +204,19 @@ function MarkdownContent({ content }) {
   return <>{blocks}</>;
 }
 
-function Message({ msg }) {
+function Message({ msg, onFindSearch }) {
   if (msg.role === 'user') {
     return (
       <div className="matty-msg matty-msg--user">
         <div className="matty-msg__bubble">{msg.content}</div>
+      </div>
+    );
+  }
+
+  if (msg.type === 'find-filter') {
+    return (
+      <div className="matty-msg matty-msg--assistant">
+        <FindFilterMessage onSearch={onFindSearch} />
       </div>
     );
   }
@@ -179,6 +266,7 @@ function ThreadItem({ thread, isActive, onSelect, onDelete }) {
 
 export default function MattyAI({ isOpen, onClose }) {
   const [view, setView] = useState('chat'); // 'chat' | 'threads'
+  const [expanded, setExpanded] = useState(false);
   const [threads, setThreads] = useState([]);
   const [currentThread, setCurrentThread] = useState(null);
   const [messages, setMessages] = useState([WELCOME_MESSAGE]);
@@ -287,11 +375,42 @@ export default function MattyAI({ isOpen, onClose }) {
     });
   };
 
+  const showFindFilter = () => {
+    // Replace any existing find-filter card and show a fresh one
+    setMessages(prev => [
+      ...prev.filter(m => m.type !== 'find-filter'),
+      { id: 'find-filter-' + Date.now(), role: 'assistant', type: 'find-filter', content: '' },
+    ]);
+  };
+
+  const handleQuickAction = (id) => {
+    if (id === 'find') {
+      showFindFilter();
+    } else {
+      const labels = { create: 'Create a material: ', compare: 'Compare materials: ' };
+      setInput(labels[id] || '');
+      inputRef.current?.focus();
+    }
+  };
+
+  // Sends a pre-built query string (e.g. from the find-filter UI)
+  const sendQuery = async (text) => {
+    // Remove the filter card from the message list
+    setMessages(prev => prev.filter(m => m.type !== 'find-filter'));
+    // Temporarily set input so `send` picks it up
+    setInput(text);
+    await sendText(text);
+  };
+
   const send = async () => {
     const text = input.trim();
     if (!text || isTyping) return;
-
     setInput('');
+    await sendText(text);
+  };
+
+  const sendText = async (text) => {
+    if (!text || isTyping) return;
     setIsTyping(true);
 
     if (!currentThread) {
@@ -389,22 +508,151 @@ export default function MattyAI({ isOpen, onClose }) {
     t.title.toLowerCase().includes(threadSearch.toLowerCase())
   );
 
-  // ── Threads view ────────────────────────────────────────────────────────────
+  const chevronLeft = (
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+      <path d="M15 19L8 12L15 5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+    </svg>
+  );
+  const clockIcon = (
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+      <circle cx="12" cy="12" r="8" stroke="currentColor" strokeWidth="1.5"/>
+      <path d="M12 8V12L15 14" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+    </svg>
+  );
+  const plusIcon = (
+    <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+      <path d="M10 4V16M4 10H16" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
+    </svg>
+  );
+
+  const InputArea = () => (
+    <div className="matty__input-area">
+      <div className="matty__quick-actions">
+        {QUICK_ACTIONS.map(({ id, Icon, label }) => (
+          <button key={id} className="matty__quick-btn" onClick={() => handleQuickAction(id)}>
+            <Icon />
+            <span>{label.toUpperCase()}</span>
+          </button>
+        ))}
+      </div>
+      <div className="matty__input-box">
+        <div className="matty__input-inner">
+          <textarea
+            ref={inputRef}
+            className="matty__textarea"
+            placeholder="Ask Matty anything…"
+            value={input}
+            onChange={e => setInput(e.target.value)}
+            onKeyDown={handleKeyDown}
+            rows={2}
+          />
+          <div className="matty__input-footer">
+            <button className="matty__upload-btn">
+              <IconUpload />
+              <span>UPLOAD FILE</span>
+            </button>
+            <button className="matty__send-btn" onClick={send} disabled={!input.trim() || isTyping}>
+              <IconSend />
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+
+  const MessagesArea = () => (
+    <div className="matty__messages">
+      {messages.map(msg => (
+        <Message key={msg.id} msg={msg} onFindSearch={sendQuery} />
+      ))}
+      {isTyping && (
+        <div className="matty-msg matty-msg--assistant">
+          <div className="matty-msg__body matty-msg__typing">
+            <span /><span /><span />
+          </div>
+        </div>
+      )}
+      <div ref={messagesEndRef} />
+    </div>
+  );
+
+  // ── Expanded view (full two-column layout) ───────────────────────────────────
+  if (expanded && isOpen) {
+    return (
+      <aside className="matty matty--open matty--expanded">
+
+        {/* Brand header */}
+        <div className="matty__exp-header">
+          <button className="matty__exp-collapse" onClick={() => setExpanded(false)} title="Collapse">
+            <IconCollapse />
+          </button>
+          <div className="matty__exp-brand">
+            <IconMattyBrand />
+            <span>matty</span>
+          </div>
+        </div>
+
+        {/* Body: sidebar + chat */}
+        <div className="matty__exp-body">
+
+          {/* Thread sidebar */}
+          <aside className="matty__exp-sidebar">
+            <div className="matty__exp-sidebar-topbar">
+              <button className="matty__back" onClick={() => {}} title="Back">
+                {chevronLeft}
+              </button>
+              <span className="matty__topbar-query" title={lastUserMsg?.content}>
+                {lastUserMsg?.content || 'Ask Matty anything…'}
+              </span>
+              <button className="matty__history" onClick={startNewThread} title="New chat">{plusIcon}</button>
+              <button className="matty__history" onClick={openThreads} title="History">{clockIcon}</button>
+            </div>
+
+            <button className="matty__exp-action" onClick={startNewThread}>
+              <IconNewChat /> <span>NEW CHAT</span>
+            </button>
+            <button className="matty__exp-action" onClick={openThreads}>
+              <IconSearchChat /> <span>SEARCH CHATS</span>
+            </button>
+
+            <span className="matty__exp-section">Recents</span>
+
+            <ul className="matty__thread-list">
+              {filteredThreads.length === 0 && (
+                <li className="matty__thread-empty">
+                  {threads.length === 0 ? 'No conversations yet' : 'No matches'}
+                </li>
+              )}
+              {filteredThreads.map(t => (
+                <ThreadItem
+                  key={t.id}
+                  thread={t}
+                  isActive={t.id === currentThread?.id}
+                  onSelect={selectThread}
+                  onDelete={handleDeleteThread}
+                />
+              ))}
+            </ul>
+          </aside>
+
+          {/* Chat panel */}
+          <div className="matty__exp-chat">
+            <MessagesArea />
+            <InputArea />
+          </div>
+        </div>
+      </aside>
+    );
+  }
+
+  // ── Threads view (compact) ───────────────────────────────────────────────────
   if (view === 'threads') {
     return (
       <aside className={`matty${isOpen ? ' matty--open' : ''}`}>
         <div className="matty__topbar">
-          <button className="matty__back" onClick={() => setView('chat')}>
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-              <path d="M15 19L8 12L15 5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-            </svg>
-          </button>
+          <button className="matty__back" onClick={() => setView('chat')}>{chevronLeft}</button>
           <span className="matty__topbar-query">Conversations</span>
-          <button className="matty__history" onClick={startNewThread} title="New conversation">
-            <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-              <path d="M10 4V16M4 10H16" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
-            </svg>
-          </button>
+          <button className="matty__history" onClick={startNewThread} title="New chat">{plusIcon}</button>
         </div>
 
         <div className="matty__thread-search">
@@ -437,81 +685,22 @@ export default function MattyAI({ isOpen, onClose }) {
     );
   }
 
-  // ── Chat view ────────────────────────────────────────────────────────────────
+  // ── Compact chat view ────────────────────────────────────────────────────────
   return (
     <aside className={`matty${isOpen ? ' matty--open' : ''}`}>
       <div className="matty__topbar">
-        <button className="matty__back" onClick={onClose}>
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-            <path d="M15 19L8 12L15 5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-          </svg>
-        </button>
+        <button className="matty__back" onClick={onClose}>{chevronLeft}</button>
         <span className="matty__topbar-query" title={lastUserMsg?.content}>
           {lastUserMsg?.content || 'Ask Matty anything…'}
         </span>
-        <button className="matty__history" onClick={openThreads} title="View conversations">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-            <circle cx="12" cy="12" r="8" stroke="currentColor" strokeWidth="1.5"/>
-            <path d="M12 8V12L15 14" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-          </svg>
+        <button className="matty__history" onClick={openThreads} title="History">{clockIcon}</button>
+        <button className="matty__expand-btn" onClick={() => setExpanded(true)} title="Expand Matty">
+          <IconExpand />
         </button>
       </div>
 
-      <div className="matty__messages">
-        {messages.map(msg => (
-          <Message key={msg.id} msg={msg} />
-        ))}
-        {isTyping && (
-          <div className="matty-msg matty-msg--assistant">
-            <div className="matty-msg__body matty-msg__typing">
-              <span /><span /><span />
-            </div>
-          </div>
-        )}
-        <div ref={messagesEndRef} />
-      </div>
-
-      <div className="matty__input-area">
-        <div className="matty__quick-actions">
-          {QUICK_ACTIONS.map(({ id, Icon, label }) => (
-            <button
-              key={id}
-              className="matty__quick-btn"
-              onClick={() => setInput(label + ': ')}
-            >
-              <Icon />
-              <span>{label.toUpperCase()}</span>
-            </button>
-          ))}
-        </div>
-
-        <div className="matty__input-box">
-          <div className="matty__input-inner">
-            <textarea
-              ref={inputRef}
-              className="matty__textarea"
-              placeholder="Ask Matty anything…"
-              value={input}
-              onChange={e => setInput(e.target.value)}
-              onKeyDown={handleKeyDown}
-              rows={2}
-            />
-            <div className="matty__input-footer">
-              <button className="matty__upload-btn">
-                <IconUpload />
-                <span>UPLOAD FILE</span>
-              </button>
-              <button
-                className="matty__send-btn"
-                onClick={send}
-                disabled={!input.trim() || isTyping}
-              >
-                <IconSend />
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
+      <MessagesArea />
+      <InputArea />
     </aside>
   );
 }

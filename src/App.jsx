@@ -16,6 +16,7 @@ function MaterialLibraryApp() {
   const [searchQuery, setSearchQuery] = useState('');
   const [viewMode, setViewMode] = useState('grid');
   const [mattyOpen, setMattyOpen] = useState(true);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   const filtered = useMemo(() => {
     if (!searchQuery) return materials;
@@ -35,7 +36,15 @@ function MaterialLibraryApp() {
 
   return (
     <div className="app">
-      <Sidebar activeItem={activeNav} onItemClick={handleNavClick} />
+      {sidebarOpen && (
+        <div className="sidebar-overlay" onClick={() => setSidebarOpen(false)} />
+      )}
+
+      <Sidebar
+        activeItem={activeNav}
+        onItemClick={id => { handleNavClick(id); setSidebarOpen(false); }}
+        isOpen={sidebarOpen}
+      />
 
       <div className="app__right">
         <Header
@@ -44,6 +53,7 @@ function MaterialLibraryApp() {
           onSearchChange={setSearchQuery}
           viewMode={viewMode}
           onViewModeChange={setViewMode}
+          onMenuClick={() => setSidebarOpen(o => !o)}
         />
 
         <div className="app__mid">

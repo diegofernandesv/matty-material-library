@@ -77,25 +77,24 @@
 }
 
 .matty-msg__bubble {
-  background: var(--primary);
-  color: var(--bg-default);
-  border-radius: 20px;
+  background: var(--bg-highlight);
+  color: var(--primary);
+  border-radius: 24px 24px 8px 24px;
   padding: 16px 20px;
   font-family: var(--font-sans);
   font-size: 12px;
-  line-height: 16px;
+  line-height: 20px;
   font-weight: 400;
-  width: 280px;
-  flex-shrink: 0;
+  max-width: 280px;
 }
 
 .matty-msg--assistant .matty-msg__body {
-  background: var(--bg-default);
-  border-radius: 20px;
-  padding: 20px;
+  background: transparent;
+  border-radius: 0;
+  padding: 4px 0;
   font-family: var(--font-sans);
   font-size: 12px;
-  line-height: 16px;
+  line-height: 20px;
   font-weight: 400;
   color: var(--primary);
   width: 100%;
@@ -216,7 +215,7 @@
   border: 1px solid var(--bg-tertiary);
   border-radius: var(--radius-md);
   font-family: var(--font-sans);
-  font-size: 10px;
+  font-size: 12px;
   font-weight: 600;
   letter-spacing: 0.4px;
   color: var(--primary);
@@ -250,7 +249,7 @@
   background: none;
   border: none;
   font-family: var(--font-sans);
-  font-size: 14px;
+  font-size: 12px;
   font-weight: 400;
   letter-spacing: 0.28px;
   color: var(--primary);
@@ -277,7 +276,7 @@
   background: var(--bg-tertiary);
   border-radius: var(--radius-md);
   font-family: var(--font-sans);
-  font-size: 10px;
+  font-size: 12px;
   font-weight: 600;
   letter-spacing: 0.4px;
   text-transform: uppercase;
@@ -413,7 +412,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 14px;
+  font-size: 12px;
   color: var(--primary-50);
   border-radius: var(--radius-sm);
   opacity: 0;
@@ -442,4 +441,408 @@
   width: 100vw;
   height: 100vh;
   background: var(--bg-secondary);
+}
+
+/* ═══════════════════════════════════════════════════════════
+   MOBILE — Matty as a full-screen bottom sheet
+   ═══════════════════════════════════════════════════════════ */
+@media (max-width: 768px) {
+
+  /* Panel itself: fixed, full screen, slides up from bottom */
+  .matty {
+    position: fixed;
+    inset: 0;
+    width: 100% !important;
+    min-width: 0 !important;
+    height: 100dvh;
+    z-index: 200;
+    border-left: none;
+    border-radius: 0;
+    display: flex;
+    flex-direction: column;
+
+    /* Hidden state: off-screen below */
+    transform: translateY(100%);
+    transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+    pointer-events: none;
+  }
+
+  .matty--open {
+    transform: translateY(0);
+    pointer-events: all;
+
+    /* Remove the width animation — position handles visibility */
+    width: 100% !important;
+    min-width: 0 !important;
+  }
+
+  /* Drag handle pill at the very top */
+  .matty__topbar::before {
+    content: '';
+    position: absolute;
+    top: 8px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 36px;
+    height: 4px;
+    border-radius: 2px;
+    background: var(--bg-highlight);
+  }
+
+  .matty__topbar {
+    position: relative;
+    padding-top: 20px;
+    height: 56px;
+    flex-shrink: 0;
+  }
+
+  /* Messages area — leaves room for keyboard */
+  .matty__messages {
+    flex: 1;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior: contain;
+    padding: 16px 16px 8px;
+  }
+
+  /* Bubbles — wider on mobile */
+  .matty-msg__bubble {
+    width: auto;
+    max-width: 85vw;
+    font-size: 12px;
+    line-height: 20px;
+    padding: 12px 16px;
+  }
+
+  .matty-msg--assistant .matty-msg__body {
+    font-size: 12px;
+    line-height: 20px;
+    padding: 0;
+    border-radius: 0;
+    background: none;
+  }
+
+  .matty-msg--assistant .matty-msg__body p {
+    line-height: 20px;
+  }
+
+  .matty-md-list li {
+    font-size: 12px;
+    line-height: 20px;
+  }
+
+  /* Input area — push above home indicator */
+  .matty__input-area {
+    flex-shrink: 0;
+    padding-bottom: env(safe-area-inset-bottom, 16px);
+    background: var(--bg-default);
+  }
+
+  .matty__input-box {
+    padding: 8px 16px 12px;
+  }
+
+  .matty__input-inner {
+    height: auto;
+    min-height: 80px;
+    border-radius: 20px;
+    padding: 14px 16px;
+  }
+
+  .matty__textarea {
+    font-size: 16px; /* prevents iOS zoom on focus */
+    line-height: 22px;
+  }
+
+  /* Quick action chips — scrollable row */
+  .matty__quick-actions {
+    padding: 8px 16px;
+    gap: 6px;
+  }
+
+  .matty__quick-btn {
+    font-size: 12px;
+    padding: 5px 10px;
+  }
+
+  /* Thread list */
+  .matty__thread-list {
+    padding: 8px 12px;
+  }
+
+  .matty-thread-item {
+    padding: 12px 10px;
+    min-height: 48px;
+  }
+
+  .matty-thread-item__title {
+    font-size: 12px;
+    line-height: 18px;
+  }
+
+  .matty__thread-search {
+    padding: 12px 16px;
+  }
+
+  /* Table scrolls horizontally on small screens */
+  .matty-table-wrap {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .matty-table th,
+  .matty-table td {
+    font-size: 12px;
+    padding: 6px;
+    min-width: 80px;
+  }
+}
+
+/* ── Find Materials filter UI ───────────────────────────── */
+.matty-find {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 4px 0;
+}
+
+.matty-find__intro {
+  font-family: var(--font-sans);
+  font-size: 12px;
+  color: var(--primary-70);
+  margin: 0;
+}
+
+.matty-find__group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.matty-find__group-label {
+  font-family: var(--font-sans);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  color: var(--primary-50);
+}
+
+.matty-find__chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.matty-find__chip {
+  display: inline-flex;
+  align-items: center;
+  padding: 5px 10px;
+  border: 1px solid var(--bg-tertiary);
+  border-radius: var(--radius-full);
+  font-family: var(--font-sans);
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--primary);
+  background: var(--bg-default);
+  cursor: pointer;
+  transition: background var(--transition), border-color var(--transition), color var(--transition);
+  white-space: nowrap;
+}
+
+.matty-find__chip:hover {
+  background: var(--bg-secondary);
+  border-color: var(--bg-highlight);
+}
+
+.matty-find__chip--on {
+  background: var(--primary);
+  border-color: var(--primary);
+  color: var(--bg-default);
+}
+
+.matty-find__chip--on:hover {
+  background: var(--color-primary-hover);
+  border-color: var(--color-primary-hover);
+}
+
+.matty-find__search-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  align-self: flex-start;
+  padding: 8px 16px;
+  background: var(--primary);
+  color: var(--bg-default);
+  border-radius: var(--radius-full);
+  font-family: var(--font-sans);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  cursor: pointer;
+  transition: background var(--transition);
+  margin-top: 2px;
+}
+
+.matty-find__search-btn:hover {
+  background: var(--color-primary-hover);
+}
+
+/* ═══════════════════════════════════════════════════════════
+   EXPANDED VIEW — two-column fullscreen overlay
+   ═══════════════════════════════════════════════════════════ */
+
+.matty--expanded {
+  position: fixed;
+  left: var(--sidebar-width);
+  right: 0;
+  top: 0;
+  bottom: 0;
+  height: 100vh;
+  width: auto !important;
+  min-width: 0 !important;
+  border-left: none;
+  flex-direction: column;
+  z-index: 90;
+  transition: none;
+}
+
+/* Brand header (88px, matches main app header height) */
+.matty__exp-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  height: var(--header-height);
+  padding: 16px 40px;
+  border-bottom: 1px solid var(--bg-tertiary);
+  flex-shrink: 0;
+  background: var(--bg-default);
+}
+
+.matty__exp-collapse {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  color: var(--primary-50);
+  transition: color var(--transition);
+}
+.matty__exp-collapse:hover { color: var(--primary); }
+
+.matty__exp-brand {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-family: var(--font-display);
+  font-size: 20px;
+  font-weight: 700;
+  letter-spacing: 0.4px;
+  color: var(--primary);
+}
+
+/* Body: sidebar + chat side by side */
+.matty__exp-body {
+  flex: 1;
+  display: flex;
+  overflow: hidden;
+  min-height: 0;
+}
+
+/* Thread sidebar within expanded view */
+.matty__exp-sidebar {
+  width: 265px;
+  min-width: 265px;
+  flex-shrink: 0;
+  border-right: 1px solid var(--bg-tertiary);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background: var(--bg-default);
+}
+
+.matty__exp-sidebar-topbar {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px;
+  border-bottom: 1px solid var(--bg-secondary);
+  flex-shrink: 0;
+  height: 48px;
+}
+
+.matty__exp-sidebar-topbar .matty__topbar-query {
+  flex: 1;
+}
+
+.matty__exp-action {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 12px 24px;
+  font-family: var(--font-sans);
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.48px;
+  text-transform: uppercase;
+  color: var(--primary);
+  transition: background var(--transition);
+  text-align: left;
+}
+.matty__exp-action:hover { background: var(--bg-secondary); }
+
+.matty__exp-section {
+  display: block;
+  padding: 8px 24px 4px;
+  font-family: var(--font-sans);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.4px;
+  text-transform: uppercase;
+  color: var(--primary-50);
+}
+
+.matty__exp-sidebar .matty__thread-list {
+  flex: 1;
+  overflow-y: auto;
+  padding: 4px 8px;
+}
+
+/* Chat panel within expanded view */
+.matty__exp-chat {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  min-width: 0;
+}
+
+/* Wider messages in expanded view */
+.matty__exp-chat .matty__messages {
+  padding: 32px 160px 16px;
+}
+
+.matty__exp-chat .matty-msg__bubble {
+  max-width: 520px;
+}
+
+/* Expand button in compact topbar */
+.matty__expand-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  color: var(--primary-50);
+  flex-shrink: 0;
+  transition: color var(--transition);
+}
+.matty__expand-btn:hover { color: var(--primary); }
+
+/* Mobile: hide expand button, expanded not supported */
+@media (max-width: 768px) {
+  .matty__expand-btn { display: none; }
+  .matty--expanded {
+    left: 0;
+  }
 }

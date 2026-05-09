@@ -141,3 +141,100 @@
   background: var(--bg-default);
   border: 1px solid var(--bg-tertiary);
 }
+
+/* ── Mobile header ──────────────────────────────────────── */
+.page-header__mobile-top,
+.page-header__mobile-body,
+.page-header__menu-btn,
+.page-header__mobile-brand {
+  display: none;
+}
+
+@media (max-width: 768px) {
+  .page-header {
+    flex-direction: column;
+    height: auto;
+    padding: 0;
+    gap: 0;
+  }
+
+  /* Hide desktop sections */
+  .page-header__left,
+  .page-header__right {
+    display: none;
+  }
+
+  /* Mobile top bar: ☰  MATERIAL LIBRARY  [grid|list] */
+  .page-header__mobile-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 16px;
+    height: 52px;
+    border-bottom: 1px solid var(--bg-tertiary);
+    width: 100%;
+    gap: 12px;
+  }
+
+  .page-header__menu-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    color: var(--primary);
+    flex-shrink: 0;
+  }
+
+  .page-header__mobile-brand {
+    display: block;
+    flex: 1;
+    font-family: var(--font-sans);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--primary);
+  }
+
+  /* Mobile body: MATERIALS title + count + search */
+  .page-header__mobile-body {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding: 16px 16px 12px;
+    width: 100%;
+    border-bottom: 1px solid var(--bg-tertiary);
+    background: var(--bg-default);
+  }
+
+  .page-header__mobile-title-row {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+  }
+
+  .page-header__mobile-body .page-header__title {
+    font-size: 28px;
+    line-height: 32px;
+  }
+
+  .page-header__mobile-body .page-header__results {
+    font-size: 14px;
+    color: var(--primary-50);
+    margin-top: 2px;
+  }
+
+  .page-header__mobile-body .page-header__search {
+    height: 36px;
+    border: 1px solid var(--bg-tertiary);
+    border-radius: var(--radius-md);
+    padding: 0 12px;
+    background: var(--bg-secondary);
+  }
+
+  /* Show view toggle inside mobile top bar */
+  .page-header__mobile-top .page-header__view-toggle {
+    display: flex;
+  }
+}

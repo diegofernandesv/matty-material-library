@@ -51,7 +51,7 @@ const NAV_ITEMS = [
   { id: 'matty-ai',        label: 'Matty AI',         Icon: IconMatty },
 ];
 
-export default function Sidebar({ activeItem, onItemClick }) {
+export default function Sidebar({ activeItem, onItemClick, isOpen }) {
   const { user } = useAuth();
 
   const handleLogout = async () => {
@@ -61,7 +61,7 @@ export default function Sidebar({ activeItem, onItemClick }) {
   const initials = user?.email?.slice(0, 2).toUpperCase() || 'U';
 
   return (
-    <aside className="sidebar">
+    <aside className={`sidebar${isOpen ? ' sidebar--open' : ''}`}>
       <div className="sidebar__top">
         <div className="sidebar__logo">
           <div className="sidebar__brand-logo">

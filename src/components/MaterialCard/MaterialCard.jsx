@@ -75,6 +75,15 @@ export default function MaterialCard({ material }) {
       </div>
 
       <div className="mat-card__info">
+        {/* Mobile-only status + brand row */}
+        <div className="mat-card__mobile-status">
+          <div className={`mat-card__status mat-card__status--${status.toLowerCase()}`}>
+            {isDeactivated ? <IconDeactivated /> : <IconActive />}
+            <span>{isDeactivated ? 'Deactivated' : 'Active'}</span>
+          </div>
+          <span className="mat-card__mobile-brand">{brand}</span>
+        </div>
+
         <div className="mat-card__top">
           {materialNumber && <span className="mat-card__number">№ {materialNumber}</span>}
           <h3 className="mat-card__name">{shortName || name}</h3>

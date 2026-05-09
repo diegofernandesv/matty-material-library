@@ -132,3 +132,19 @@
 .filter-bar__action--clear {
   border: none;
 }
+
+/* ── Mobile filter bar ──────────────────────────────────── */
+@media (max-width: 768px) {
+  .filter-bar {
+    padding: 10px 16px;
+    gap: 6px;
+    overflow-x: auto;
+    flex-wrap: nowrap;
+  }
+
+  .filter-bar::-webkit-scrollbar { display: none; }
+
+  .filter-bar__actions {
+    flex-shrink: 0;
+  }
+}

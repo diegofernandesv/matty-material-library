@@ -17,20 +17,18 @@ function IconUpload() {
 function IconSend() {
   return <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M13.5 2.5L7 9M13.5 2.5L9 14L7 9M13.5 2.5L2 6.5L7 9" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>;
 }
-function IconExpand() {
-  return <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M8 3H5a2 2 0 00-2 2v3M21 8V5a2 2 0 00-2-2h-3M16 21h3a2 2 0 002-2v-3M3 16v3a2 2 0 002 2h3" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>;
+// Real Figma assets
+const MATTY_LOGO_SRC = 'http://localhost:3845/assets/d3cdbc35e08903ea323bfc1a0dec6f9bf1840293.svg';
+const MATTY_MAXIMIZE_SRC = 'http://localhost:3845/assets/647544c7983b49853e8421d6bf5bea1efd35a8c8.svg';
+
+function MattyLogo() {
+  return <img src={MATTY_LOGO_SRC} alt="Matty" width="16" height="16" style={{display:'block',flexShrink:0}} />;
 }
-function IconCollapse() {
-  return <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M4 14h6m0 0v6m0-6L3 21M20 10h-6m0 0V4m0 6l7-7" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>;
-}
-function IconMattyBrand() {
-  return <svg width="16" height="16" viewBox="0 0 20 20" fill="none"><path d="M10 2C6.686 2 4 4.686 4 8C4 10.21 5.164 12.148 6.916 13.254L6 18L10.5 15.9C10.666 15.966 10.832 16 11 16C14.314 16 17 13.314 17 10C17 6.686 13.866 2 10 2Z" stroke="currentColor" strokeWidth="1.5" strokeLinejoin="round"/><circle cx="7.5" cy="9" r="0.9" fill="currentColor"/><circle cx="10" cy="9" r="0.9" fill="currentColor"/><circle cx="12.5" cy="9" r="0.9" fill="currentColor"/></svg>;
+function MaximizeIcon({ rotated }) {
+  return <img src={MATTY_MAXIMIZE_SRC} alt="" width="24" height="24" style={{display:'block',transform: rotated ? 'rotate(180deg)' : 'none'}} />;
 }
 function IconNewChat() {
   return <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 3H13a1 1 0 011 1v8a1 1 0 01-1 1H3a1 1 0 01-1-1V8M5 1L1 5m0 0l4 4M1 5h8" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round"/></svg>;
-}
-function IconSearchChat() {
-  return <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="7" cy="7" r="4.5" stroke="currentColor" strokeWidth="1.2"/><path d="M10.5 10.5L14 14" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round"/></svg>;
 }
 
 const QUICK_ACTIONS = [
@@ -525,7 +523,8 @@ export default function MattyAI({ isOpen, onClose }) {
     </svg>
   );
 
-  const InputArea = () => (
+  // Inline JSX blocks — NOT sub-components (avoids remount on every keystroke)
+  const inputArea = (
     <div className="matty__input-area">
       <div className="matty__quick-actions">
         {QUICK_ACTIONS.map(({ id, Icon, label }) => (
@@ -560,7 +559,7 @@ export default function MattyAI({ isOpen, onClose }) {
     </div>
   );
 
-  const MessagesArea = () => (
+  const messagesArea = (
     <div className="matty__messages">
       {messages.map(msg => (
         <Message key={msg.id} msg={msg} onFindSearch={sendQuery} />
@@ -581,15 +580,15 @@ export default function MattyAI({ isOpen, onClose }) {
     return (
       <aside className="matty matty--open matty--expanded">
 
-        {/* Brand header */}
+        {/* Brand header — matches Figma "Header Matty Expanded" exactly */}
         <div className="matty__exp-header">
-          <button className="matty__exp-collapse" onClick={() => setExpanded(false)} title="Collapse">
-            <IconCollapse />
-          </button>
           <div className="matty__exp-brand">
-            <IconMattyBrand />
+            <MattyLogo />
             <span>matty</span>
           </div>
+          <button className="matty__exp-collapse" onClick={() => setExpanded(false)} title="Collapse">
+            <MaximizeIcon />
+          </button>
         </div>
 
         {/* Body: sidebar + chat */}
@@ -637,8 +636,8 @@ export default function MattyAI({ isOpen, onClose }) {
 
           {/* Chat panel */}
           <div className="matty__exp-chat">
-            <MessagesArea />
-            <InputArea />
+            {messagesArea}
+            {inputArea}
           </div>
         </div>
       </aside>
@@ -688,19 +687,21 @@ export default function MattyAI({ isOpen, onClose }) {
   // ── Compact chat view ────────────────────────────────────────────────────────
   return (
     <aside className={`matty${isOpen ? ' matty--open' : ''}`}>
+      {/* Compact topbar — matches Figma "header matty": rotated maximize + matty title */}
       <div className="matty__topbar">
-        <button className="matty__back" onClick={onClose}>{chevronLeft}</button>
-        <span className="matty__topbar-query" title={lastUserMsg?.content}>
-          {lastUserMsg?.content || 'Ask Matty anything…'}
-        </span>
-        <button className="matty__history" onClick={openThreads} title="History">{clockIcon}</button>
-        <button className="matty__expand-btn" onClick={() => setExpanded(true)} title="Expand Matty">
-          <IconExpand />
+        <button className="matty__expand-btn" onClick={() => setExpanded(true)} title="Expand">
+          <MaximizeIcon rotated />
         </button>
+        <div className="matty__topbar-brand">
+          <MattyLogo />
+          <span className="matty__topbar-brand-text">matty</span>
+        </div>
+        <button className="matty__history" onClick={openThreads} title="History">{clockIcon}</button>
+        <button className="matty__back" onClick={onClose} title="Close">{chevronLeft}</button>
       </div>
 
-      <MessagesArea />
-      <InputArea />
+      {messagesArea}
+      {inputArea}
     </aside>
   );
 }

@@ -54,22 +54,25 @@ ${materialsJson}
 --- END OF DATABASE ---`;
 }
 
+// In production (Vercel experimentalServices) both services share the same
+// domain so no CORS is needed. In development we allow localhost:5173.
 const allowedOrigins = process.env.CORS_ORIGIN
   ? process.env.CORS_ORIGIN.split(',').map(o => o.trim())
   : ['http://localhost:5173'];
 
 app.use(cors({
   origin: (origin, cb) => {
-    if (!origin || allowedOrigins.includes(origin) || allowedOrigins.includes('*')) {
+    if (!origin || allowedOrigins.includes('*') || allowedOrigins.includes(origin)) {
       cb(null, true);
     } else {
-      cb(new Error(`CORS blocked: ${origin}`));
+      cb(null, false);
     }
   },
+  credentials: true,
 }));
 app.use(express.json());
 
-app.get("/", (req, res) => {
+app.get("/", (_req, res) => {
   res.json({ message: "Matty Material Library API", version: "1.0.0" });
 });
 

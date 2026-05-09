@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import './MaterialCard.css';
 
 function IconFabric() {
@@ -31,15 +32,35 @@ export default function MaterialCard({ material }) {
     status = 'ACTIVE',
     materialNumber,
     previewColor,
+    imageUrl,
   } = material;
 
+  const [imgFailed, setImgFailed] = useState(false);
   const isDeactivated = status === 'DEACTIVATED';
 
   return (
     <div className="mat-card">
-      <div className="mat-card__preview" style={{ background: previewColor || '#d4d4d0' }}>
-        <div className="mat-card__brand-logo">
-          <span className="mat-card__brand-text">{brand || ''}</span>
+      <div
+        className="mat-card__preview"
+        style={{ background: previewColor || '#d4d4d0' }}
+      >
+        {imageUrl && !imgFailed && (
+          <img
+            src={imageUrl}
+            alt={name}
+            className="mat-card__preview-img"
+            onError={() => setImgFailed(true)}
+          />
+        )}
+
+        {/* colour-tinted overlay so the image always feels on-brand */}
+        <div
+          className="mat-card__preview-overlay"
+          style={{ background: previewColor ? `${previewColor}55` : 'transparent' }}
+        />
+
+        <div className="mat-card__brand-badge">
+          <span>{brand}</span>
         </div>
       </div>
 

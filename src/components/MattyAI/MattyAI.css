@@ -708,6 +708,22 @@
    EXPANDED VIEW — two-column fullscreen overlay
    ═══════════════════════════════════════════════════════════ */
 
+@keyframes matty-expand-in {
+  from {
+    opacity: 0;
+    transform: scale(0.97) translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+@keyframes matty-expand-out {
+  from { opacity: 1; transform: scale(1) translateY(0); }
+  to   { opacity: 0; transform: scale(0.97) translateY(12px); }
+}
+
 .matty--expanded {
   position: fixed;
   left: var(--sidebar-width);
@@ -721,12 +737,15 @@
   flex-direction: column;
   z-index: 90;
   transition: none;
+  transform-origin: bottom right;
+  animation: matty-expand-in 0.28s cubic-bezier(0.4, 0, 0.2, 1) both;
 }
 
 /* Brand header (88px, matches main app header height) */
 .matty__exp-header {
   display: flex;
   align-items: center;
+  justify-content: space-between;
   gap: 12px;
   height: var(--header-height);
   padding: 16px 40px;

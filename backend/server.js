@@ -27,30 +27,31 @@ Rules:
 async function getMaterialsContext() {
   try {
     const materials = await sql`
-      SELECT
-        material_number, name, category, subcategory, material_state,
-        composition, weight, width, technical_construction, manufacture_detail,
-        warp_weft, finish, dyeing_method, brand, library,
-        country_of_origin, lead_time_days, moq, price_per_unit, currency,
-        certifications, recycled_content_pct, is_sustainable,
-        care_instructions, end_of_life, risk_level, risk_comments,
-        suitable_for, season, tags
+      SELECT material_number, name, brand, category, subcategory, material_state, composition, weight
       FROM materials
+      WHERE material_state != 'Deactivated'
       ORDER BY material_number
+      LIMIT 2000
     `;
-    return JSON.stringify(materials, null, 2);
+    const header = 'number|name|brand|category|subcategory|state|composition|weight';
+    const rows = materials.map(m =>
+      [m.material_number, m.name, m.brand, m.category, m.subcategory, m.material_state, m.composition, m.weight]
+        .map(v => (v ?? '').toString().replace(/\|/g, '/'))
+        .join('|')
+    );
+    return { csv: [header, ...rows].join('\n'), count: materials.length };
   } catch (err) {
     console.error("Failed to fetch materials for AI context:", err.message);
-    return "[]";
+    return { csv: '', count: 0 };
   }
 }
 
 async function buildSystemPrompt() {
-  const materialsJson = await getMaterialsContext();
+  const { csv, count } = await getMaterialsContext();
   return `${MATTY_BASE_PROMPT}
 
---- MATERIALS DATABASE (${JSON.parse(materialsJson).length} records) ---
-${materialsJson}
+--- MATERIALS DATABASE (${count} records, pipe-delimited: number|name|brand|category|subcategory|state|composition|weight) ---
+${csv}
 --- END OF DATABASE ---`;
 }
 
@@ -164,7 +165,7 @@ app.post("/api/threads", requireAuth, async (req, res) => {
       try {
         const systemPrompt = await buildSystemPrompt();
         const aiResponse = await openai.chat.completions.create({
-          model: "gpt-4o",
+          model: "gpt-4o-mini",
           messages: [
             { role: "system", content: systemPrompt },
             { role: "user", content: trimmedContent },
@@ -236,7 +237,7 @@ app.post("/api/threads/:id/messages", requireAuth, async (req, res) => {
 
     const systemPrompt = await buildSystemPrompt();
     const aiResponse = await openai.chat.completions.create({
-      model: "gpt-4o",
+      model: "gpt-4o-mini",
       messages: [
         { role: "system", content: systemPrompt },
         ...formattedMessages,

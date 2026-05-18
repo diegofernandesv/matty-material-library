@@ -1,0 +1,124 @@
+/* ── Row ──────────────────────────────────────────── */
+.mat-row {
+  display: grid;
+  grid-template-columns: 400px repeat(5, 1fr);
+  gap: 20px;
+  align-items: center;
+  min-height: 72px;
+  padding: 0 40px;
+  border-bottom: 1px solid var(--bg-tertiary);
+  background: var(--bg-default);
+  cursor: pointer;
+  transition: background var(--transition);
+}
+
+.mat-row:hover {
+  background: var(--bg-secondary);
+}
+
+/* ── Material column ──────────────────────────────── */
+.mat-row__material {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  height: 100%;
+  padding: 4px 0;
+}
+
+.mat-row__thumb {
+  width: 64px;
+  height: 64px;
+  min-width: 64px;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.mat-row__thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.mat-row__thumb-placeholder {
+  object-fit: cover !important;
+}
+
+.mat-row__text {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  padding: 8px 12px;
+  flex: 1;
+  min-width: 0;
+}
+
+/* ── Status ───────────────────────────────────────── */
+.mat-row__status {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-family: var(--font-sans);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  line-height: 14px;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.mat-row__status--active      { color: #23a937; }
+.mat-row__status--inactive    { color: rgba(34, 34, 34, 0.5); }
+.mat-row__status--deactivated { color: var(--error, #dc2626); }
+
+/* ── Name line ────────────────────────────────────── */
+.mat-row__nameline {
+  display: flex;
+  align-items: baseline;
+  gap: 0;
+  min-width: 0;
+  flex-wrap: nowrap;
+  overflow: hidden;
+}
+
+.mat-row__name {
+  font-family: var(--font-sans);
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--primary);
+  line-height: 20px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.mat-row__sep {
+  font-family: var(--font-sans);
+  font-size: 14px;
+  font-weight: 400;
+  color: rgba(34, 34, 34, 0.2);
+  line-height: 20px;
+  flex-shrink: 0;
+}
+
+.mat-row__number {
+  font-family: var(--font-sans);
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--primary);
+  line-height: 20px;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+/* ── Data cells ───────────────────────────────────── */
+.mat-row__cell {
+  font-family: var(--font-sans);
+  font-size: 14px;
+  font-weight: 400;
+  color: var(--primary);
+  line-height: 20px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}

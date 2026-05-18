@@ -1,89 +1,83 @@
 import { useState } from 'react';
+import { Icon } from '../ui/Icon';
 import './MaterialCard.css';
 
-function IconFabric() {
-  return <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M2 4C2 4 4 6 8 6C12 6 14 4 14 4M2 8C2 8 4 10 8 10C12 10 14 8 14 8M2 12C2 12 4 14 8 14C12 14 14 12 14 12" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round"/></svg>;
-}
-function IconWeight() {
-  return <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 13L4.5 6H11.5L13 13H3Z" stroke="currentColor" strokeWidth="1.2" strokeLinejoin="round"/><path d="M6 6C6 4.9 6.9 4 8 4C9.1 4 10 4.9 10 6" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round"/></svg>;
-}
-function IconSupplier() {
-  return <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M2 5L8 2L14 5V11L8 14L2 11V5Z" stroke="currentColor" strokeWidth="1.2" strokeLinejoin="round"/></svg>;
-}
-function IconMore() {
-  return <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><circle cx="10" cy="5" r="1.2" fill="currentColor"/><circle cx="10" cy="10" r="1.2" fill="currentColor"/><circle cx="10" cy="15" r="1.2" fill="currentColor"/></svg>;
-}
-function IconDeactivated() {
-  return <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="5.5" stroke="#d83636" strokeWidth="1.2"/><path d="M5.5 5.5L10.5 10.5M10.5 5.5L5.5 10.5" stroke="#d83636" strokeWidth="1.2" strokeLinecap="round"/></svg>;
-}
-function IconActive() {
-  return <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="5.5" stroke="#22c55e" strokeWidth="1.2"/><path d="M5.5 8L7.5 10L10.5 6" stroke="#22c55e" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round"/></svg>;
+function StatusBadge({ state }) {
+  if (state === 'Deactivated') {
+    return (
+      <div className="mat-status mat-status--deactivated">
+        <Icon name="cancel" size={13} />
+        <span>Deactivated</span>
+      </div>
+    );
+  }
+  if (state === 'Inactive') {
+    return (
+      <div className="mat-status mat-status--inactive">
+        <Icon name="remove_circle" size={13} />
+        <span>Not Active</span>
+      </div>
+    );
+  }
+  return (
+    <div className="mat-status mat-status--active">
+      <Icon name="check_circle" size={13} fill={1} />
+      <span>Active</span>
+    </div>
+  );
 }
 
 export default function MaterialCard({ material }) {
   const {
     name,
-    shortName,
+    short_name: shortName,
     composition,
     subcategory,
     weight,
-    manufacture,
+    manufacture_detail: manufacture,
     brand,
-    status = 'ACTIVE',
-    materialNumber,
-    previewColor,
-    imageUrl,
+    material_state,
+    material_number: materialNumber,
+    preview_color: previewColor,
+    image_url: imageUrl,
   } = material;
 
   const [imgFailed, setImgFailed] = useState(false);
-  const isDeactivated = status === 'DEACTIVATED';
 
   return (
     <div className="mat-card">
-      <div
-        className="mat-card__preview"
-        style={{ background: previewColor || '#d4d4d0' }}
-      >
-        {imageUrl && !imgFailed && (
+      <div className="mat-card__preview" style={{ background: (imageUrl && !imgFailed) ? (previewColor || '#d4d4d0') : 'transparent' }}>
+        {imageUrl && !imgFailed ? (
           <img
             src={imageUrl}
             alt={name}
             className="mat-card__preview-img"
             onError={() => setImgFailed(true)}
           />
+        ) : (
+          <img
+            src="/placeholder.png"
+            alt=""
+            className="mat-card__preview-img mat-card__preview-img--placeholder"
+          />
         )}
-
-        {/* colour-tinted overlay so the image always feels on-brand */}
         <div
           className="mat-card__preview-overlay"
-          style={{ background: previewColor ? `${previewColor}55` : 'transparent' }}
+          style={{ background: previewColor ? `${previewColor}44` : 'transparent' }}
         />
-
-        <div className="mat-card__brand-badge">
-          <span>{brand}</span>
-        </div>
+        {brand && (
+          <span className="mat-card__brand-watermark">{brand}</span>
+        )}
       </div>
 
       <div className="mat-card__actions">
-        <div className={`mat-card__status mat-card__status--${status.toLowerCase()}`}>
-          {isDeactivated ? <IconDeactivated /> : <IconActive />}
-          <span>{isDeactivated ? 'Deactivated' : 'Active'}</span>
-        </div>
+        <StatusBadge state={material_state} />
         <button className="mat-card__more">
-          <IconMore />
+          <Icon name="more_horiz" size={18} />
         </button>
       </div>
 
       <div className="mat-card__info">
-        {/* Mobile-only status + brand row */}
-        <div className="mat-card__mobile-status">
-          <div className={`mat-card__status mat-card__status--${status.toLowerCase()}`}>
-            {isDeactivated ? <IconDeactivated /> : <IconActive />}
-            <span>{isDeactivated ? 'Deactivated' : 'Active'}</span>
-          </div>
-          <span className="mat-card__mobile-brand">{brand}</span>
-        </div>
-
         <div className="mat-card__top">
           {materialNumber && <span className="mat-card__number">№ {materialNumber}</span>}
           <h3 className="mat-card__name">{shortName || name}</h3>
@@ -92,15 +86,15 @@ export default function MaterialCard({ material }) {
 
         <div className="mat-card__props">
           <div className="mat-card__prop">
-            <IconFabric />
-            <span>{subcategory || 'Woven'}</span>
+            <Icon name="texture" size={14} />
+            <span>{subcategory || '—'}</span>
           </div>
           <div className="mat-card__prop">
-            <IconWeight />
+            <Icon name="weight" size={14} />
             <span>{weight || '—'}</span>
           </div>
           <div className="mat-card__prop">
-            <IconSupplier />
+            <Icon name="factory" size={14} />
             <span>{manufacture || '—'}</span>
           </div>
         </div>

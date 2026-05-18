@@ -298,6 +298,10 @@ export default function MattyAI({ isOpen, onClose, onExpand }) {
     if (isOpen && view === 'chat') inputRef.current?.focus();
   }, [isOpen, view]);
 
+  useEffect(() => {
+    if (!isOpen) setExpanded(false);
+  }, [isOpen]);
+
   const loadThreads = useCallback(async () => {
     try {
       const res = await apiFetch('/api/threads');

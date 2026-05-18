@@ -116,6 +116,29 @@
   object-fit: contain;
 }
 
+.page-header__matty-btn {
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  border: 1px solid var(--bg-tertiary);
+  background: var(--bg-default);
+  color: var(--primary-50);
+  transition: color var(--transition), background var(--transition);
+}
+
+.page-header__matty-btn:hover {
+  color: var(--primary);
+  background: var(--bg-secondary);
+}
+
+.page-header__matty-btn--active {
+  color: var(--primary);
+  border-color: var(--primary-20);
+}
+
 .page-header__view-toggle {
   display: flex;
   align-items: center;
